@@ -65,11 +65,19 @@ def _read_configs(config_file):
     return json.loads(cf.read())
 
 
+def dir_path(p):
+    if path.isdir(p):
+        return p
+    else:
+        raise argparse.ArgumentTypeError(f"readable_dir:{p} is not a valid path")
+
+
 parser = argparse.ArgumentParser(description=DESCRIPTION, formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument('--config-file', dest='config_file', type=argparse.FileType('r'),
                     required=True,
                     help='config file with settings')
-
+parser.add_argument('--metric-output-folder', dest='metric_output_folder', type=dir_path,
+                    help='folder to output readings to (defaults to being read from the config file)')
 
 
 if __name__ == '__main__':
@@ -88,4 +96,6 @@ if __name__ == '__main__':
     credentials = config["credentials"]
     client.login_and_set_session(credentials["username"], credentials["password"])
 
-    tempcontrolledfan.update_fans(client, fan_temp_max=config["fan_temp_max"], temp_prefix=TEMP_PREFIX)
+    metric_output_folder = args.metric_output_folder or config.get("metric_output_folder", None)
+
+    tempcontrolledfan.update_fans(client, fan_temp_max=config["fan_temp_max"], temp_prefix=TEMP_PREFIX, metric_output_folder=metric_output_folder)

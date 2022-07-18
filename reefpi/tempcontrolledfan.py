@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import os
+
 ############################################################
 # Example light data:
 # {"id":"7","name":"DC 4 fan",
@@ -62,7 +64,13 @@ def _get_lights_from_macro(macro_for_temp, lights):
     return {k: lights[k] for k in light_ids}
 
 
-def update_fans(client, fan_temp_max, temp_prefix):
+def _write_frac_to_metric_output_folder(temp, metric_output_folder, temp_frac):
+    temp_id = temp["id"]
+    with open(os.path.join(metric_output_folder, f"varfan-temp-{temp_id}"), "w") as f:
+        f.write(str(temp_frac))
+
+
+def update_fans(client, fan_temp_max, temp_prefix, metric_output_folder):
     """ Set the appropriate fan speed for temp controlled fans """
 
     lights = _index_by_id(client.get_lights())
@@ -81,6 +89,9 @@ def update_fans(client, fan_temp_max, temp_prefix):
 
         temp_frac = _calc_frac_of_temp_range(fan_config, cur=cur_reading["temperature"])
 
+        if metric_output_folder:
+            _write_frac_to_metric_output_folder(temp, metric_output_folder, temp_frac)
+
         lights = _get_lights_from_macro(macro_for_temp, lights)
 
         for light_id, light in lights.items():
@@ -88,5 +99,6 @@ def update_fans(client, fan_temp_max, temp_prefix):
             # Just to make sure it gets flipped on
             updated_light = {**updated_light, **{"enabled": True}}
 
-            print("Setting fan({light_id}, \"{fan_name}\") speed to {temp_frac} due to cur_reading={cur_reading} for \"{temp_name}\"".format(light_id=light_id, fan_name=light["name"], temp_frac=round(temp_frac*100), cur_reading=cur_reading["temperature"], temp_name=temp["name"]))
+            print("Setting fan({light_id}, \"{fan_name}\") speed to {temp_frac} due to cur_reading={cur_reading} for \"{temp_name}\" ({temp_id})".format(
+                light_id=light_id, fan_name=light["name"], temp_frac=round(temp_frac*100), cur_reading=cur_reading["temperature"], temp_name=temp["name"], temp_id=temp["id"]))
             client.update_light(updated_light)
