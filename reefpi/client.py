@@ -15,10 +15,10 @@ class ReefPiClient(object):
        self.session = session
        return session
 
+
     ####################
     def get_temps(self):
         r = self.session.get(self._url("/api/tcs"))
-        # TODO: error
         if r.status_code != 200:
             raise Exception(f"Could not fetch temps, status_code={r.status_code}")
         return json.loads(r.text)
@@ -27,7 +27,6 @@ class ReefPiClient(object):
     # { "temperature": 78.35 }
     def get_current_reading(self, temp_id):
         r = self.session.get(self._url("/api/tcs/{id}/current_reading".format(id=temp_id)))
-        # TODO: error
         if r.status_code != 200:
             raise Exception(f"Could not fetch current_reading, status_code={r.status_code}")
 
@@ -37,16 +36,14 @@ class ReefPiClient(object):
     ####################
     def get_macros(self):
         r = self.session.get(self._url("/api/macros"))
-        # TODO: error
         if r.status_code != 200:
-            raise Exception("Could not fetch macros")
+            raise Exception(f"Could not fetch macros, status_code={r.status_code}")
         return json.loads(r.text)
 
 
     ####################
     def get_lights(self):
         r = self.session.get(self._url("/api/lights"))
-        # TODO: error
         if r.status_code != 200:
             raise Exception(f"Could not fetch lights, status_code={r.status_code}")
         return json.loads(r.text)
@@ -58,8 +55,6 @@ class ReefPiClient(object):
 
         light_id = light["id"]
         r = self.session.post(self._url(f"/api/lights/{light_id}"), data=json.dumps(light))
-        print(json.dumps(light))
-        # TODO: error
         if r.status_code != 200:
             raise Exception(f"Could not update light with id={light_id}, status_code={r.status_code}")
 

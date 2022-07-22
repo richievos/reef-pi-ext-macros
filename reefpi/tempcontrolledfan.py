@@ -70,11 +70,13 @@ def _write_frac_to_metric_output_folder(temp, metric_output_folder, temp_frac):
         f.write(str(temp_frac))
 
 
-def update_fans(client, fan_temp_max, temp_prefix, metric_output_folder):
+def update_fans(client, fan_temp_max, fan_speed_min, temp_prefix, metric_output_folder):
     """ Set the appropriate fan speed for temp controlled fans """
 
     lights = _index_by_id(client.get_lights())
     macros = _index_by_id(client.get_macros())
+
+    fan_speed_min_frac = fan_speed_min / 100.0
 
     controlled_temps = _get_controlled_temps(client, temp_prefix)
     for temp in controlled_temps:
@@ -88,6 +90,8 @@ def update_fans(client, fan_temp_max, temp_prefix, metric_output_folder):
         cur_reading = client.get_current_reading(temp["id"])
 
         temp_frac = _calc_frac_of_temp_range(fan_config, cur=cur_reading["temperature"])
+        if temp_frac < fan_speed_min_frac:
+            temp_frac = 0.0
 
         if metric_output_folder:
             _write_frac_to_metric_output_folder(temp, metric_output_folder, temp_frac)

@@ -98,4 +98,4 @@ if __name__ == '__main__':
 
     metric_output_folder = args.metric_output_folder or config.get("metric_output_folder", None)
 
-    tempcontrolledfan.update_fans(client, fan_temp_max=config["fan_temp_max"], temp_prefix=TEMP_PREFIX, metric_output_folder=metric_output_folder)
+    tempcontrolledfan.update_fans(client, fan_temp_max=config["fan_temp_max"], fan_speed_min=config["fan_speed_min"], temp_prefix=TEMP_PREFIX, metric_output_folder=metric_output_folder)

@@ -4,6 +4,7 @@
     "username": "reef-pi",
     "password": "reef-pi"
   },
+  "fan_speed_min": 20,
   "fan_temp_max": {
     "F": 1.5,
     "C": 0.8
